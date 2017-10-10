@@ -42,32 +42,46 @@ paths:
       responses:
         '201':
           description: 创建项目成功
-          
+        '400':
+          description: 创建项目失败
+
   /projects/{id}:
     get:
-      description: 读取项目内容
+      description: 获取项目内容
       parameters:
         - in: path
           name: id
           description: 项目ID
+          required: true
           schema:
             type: string
-          required: true
       responses:
         '200':
           description: success
           content:
-            application/json:
+            'application/json':
               schema:
-                $ref: '#/components/schemas/BOI'
-              example:
-                raw: {}
-                mdl: {}
-                prop: {}
-                con: {}
+                type: array
+                items:
+                  $ref: '#/components/schemas/Node'
+                example:
+                  id: 'proj123'
+                  nodes:
+                    - id: "m1"
+                      name: "模型1"
+                      path: "d1/d2"
+                      type: "model"
+                    - id: "m2"
+                      name: "模型2"
+                      path: "d3"
+                      type: "model"
+                    - id: "d5"
+                      name: "文件夹2"
+                      path: "d3/d4"
+                      type: "directory"
         '404':
           description: 项目不存在
-          
+
     put:
       description: 更新项目内容
       parameters:
@@ -94,7 +108,7 @@ paths:
           description: success
 
     delete:
-      description: Deletes a project
+      description: 删除项目
       parameters:
         - in: path
           name: id
@@ -107,6 +121,83 @@ paths:
           description: Project deleted
         '404':
           description: Project not found
+
+  /projects/{id}/directory:
+    post:
+      description: 新建项目目录
+      parameters:
+        - in: path
+          name: id
+          description: 项目ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 新增信息
+        required: true
+        content:
+          'application/json':
+            schema:
+              $ref: '#/components/schemas/Directory'
+            example:
+              $ref: '#/components/examples/directory'
+      responses:
+         '201':
+           description: 新建目录成功
+         '400':
+           description: 新建目录失败
+
+    delete:
+      description: 删除项目目录
+      parameters:
+        - in: path
+          name: pid
+          description: 项目ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: did
+          description: 目录ID
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: directory deleted
+        '404':
+          description: directory not found
+
+  /projects/{pid}/directory/{did}:
+    put:
+      description: 更新项目目录
+      parameters:
+        - in: path
+          name: pid
+          description: 项目ID
+          required: true
+          schema:
+            type: string
+        - in: path
+          name: did
+          description: 目录ID
+          required: true
+          schema:
+            type: string
+      requestBody:
+        description: 项目信息
+        required: true
+        content:
+          'application/json':
+            schema:
+               $ref: '#/components/schemas/Directory'
+            example:
+               $ref: '#/components/examples/directory'
+      responses:
+        '200':
+           description: updata success
+        '400':
+           description: updata failed
 
   /projects/{id}/dataobj:
     put:
@@ -126,7 +217,7 @@ paths:
 
   /projects/{id}/model:
     post:
-      description: 新建模型
+      description: 新建模型文件
       requestBody:
         description: 模型信息
         required: true
@@ -140,12 +231,12 @@ paths:
                 name: 模型名称
                 path: d3/d4
       responses:
-        '200':
+        '201':
           description: 模型创建成功
         '400':
           description: 模型创建失败
 
-projects/{pid}/model/{mid}:
+  /projects/{pid}/model/{mid}:
     delete:
         description: delete a model
         parameters:
@@ -311,6 +402,11 @@ components:
         name: '广东风电'
       summary: A demo project
 
+    directory:
+      value:
+        name: "业务对象2"
+        path: "d3/d4"
+
   schemas:
     Project:
       type: object
@@ -411,3 +507,41 @@ components:
         - mdl
         - prop
         - con
+
+    Directory:
+      type: object
+      properties:
+        name:
+          type: string
+        path:
+          type: string
+      required:
+        - name
+        - path
+
+    Node:
+      type: object
+      properties:
+        id:
+          type: string
+        nodes:
+          type: array
+          items:
+            type: object
+            properties:
+             id:
+              type: string
+             name:
+              type: string
+             path:
+              type: string
+             type:
+              type: string
+            required:
+              - id
+              - name
+              - path
+              - type
+      required:
+        - id
+        - nodes
