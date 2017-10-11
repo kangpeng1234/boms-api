@@ -1,0 +1,319 @@
+swagger: "2.0"
+info:
+  description: "业务对象管理后端 API 列表"
+  version: "0.0.1"
+  title: "BOMS API"
+  termsOfService: "http://swagger.io/terms/"
+  contact:
+    email: "leechau@126.com"
+  license:
+    name: "Apache 2.0"
+    url: "http://www.apache.org/licenses/LICENSE-2.0.html"
+host: "192.168.12.220:8080"
+basePath: "/v2"
+tags:
+- name: "project"
+  description: "项目管理"
+- name: "directory"
+  description: "文件夹管理"
+- name: "model"
+  description: "模型文件管理"
+- name: "publish"
+  description: "模型发布相关"
+schemes:
+- "http"
+
+paths:
+  /projects:
+    get:
+      tags:
+      - "project"
+      summary: "返回项目列表"
+      description: ""
+      operationId: ""
+      produces:
+      - "application/json"
+      responses:
+        200:
+          description: success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Project'
+            example:
+              - id: 101
+                name: 广东风电
+              - id: 102
+                name: 国网财务分析
+        405:
+          description: "Invalid input"
+
+    post:
+      tags:
+      - "project"
+      summary: "新建项目"
+      description: 新建项目
+      operationId: "newProject"
+      consumes:
+      - "application/json"
+      produces:
+      - "text/plain"
+      parameters:
+      - name: "project"
+        in: "body"
+        description: "待创建项目内容"
+        required: true
+        schema:
+          $ref: "#/definitions/Project"
+      responses:
+        '201':
+          description: 创建项目成功
+        '400':
+          description: 创建项目失败
+
+  /projects/{id}:
+    get:
+      tags:
+      - "project"
+      summary: "获取指定项目内容"
+      description: 获取项目内容
+      operationId: ""
+      produces:
+      - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: 项目ID
+          required: true
+          type: "string"
+      responses:
+        '200':
+          description: success
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/Node'
+
+    put:
+      tags:
+      - "project"
+      summary: "更新项目内容"
+      description: 更新项目内容
+      operationId: ""
+      produces:
+      - "application/json"
+      parameters:
+        - in: "path"
+          name: "id"
+          description: 项目ID
+          type: "string"
+          required: true
+        - name: "project"
+          in: "body"
+          description: "项目内容"
+          required: true
+          schema:
+            $ref: "#/definitions/BOI"
+      responses:
+        '200':
+          description: success
+
+    delete:
+      tags:
+      - "project"
+      summary: "删除项目"
+      description: 删除项目
+      operationId: ""
+      produces:
+      - "application/json"
+      parameters:
+        - in: path
+          name: id
+          description: 项目ID
+          required: true
+          type: "string"
+      responses:
+        '204':
+          description: Project deleted
+        '404':
+          description: Project not found
+
+  /projects/{id}/directory:
+    post:
+      tags:
+      - "directory"
+      summary: "新建项目目录"
+      description: 新建项目目录
+      parameters:
+        - in: path
+          name: id
+          description: 项目ID
+          required: true
+          type: string
+        - name: "project"
+          in: "body"
+          description: "项目内容"
+          required: true
+          schema:
+            $ref: "#/definitions/Directory"
+      responses:
+         '201':
+           description: 新建目录成功
+         '400':
+           description: 新建目录失败
+
+  /projects/{pid}/directory/{did}:
+    delete:
+      tags:
+      - "directory"
+      summary: "删除项目目录"
+      description: 删除项目目录
+      parameters:
+        - in: path
+          name: pid
+          description: 项目ID
+          required: true
+          type: "string"
+        - in: path
+          name: did
+          description: 目录ID
+          required: true
+          type: "string"
+      responses:
+        '204':
+          description: directory deleted
+        '404':
+          description: directory not found
+
+  /projects/{pid}/directory1/{did}:
+    put:
+      tags:
+      - "directory"
+      summary: "更新项目目录"
+      description: 更新项目目录
+      parameters:
+        - in: path
+          name: pid
+          description: 项目ID
+          type: string
+          required: true
+        - in: path
+          name: did
+          description: 项目路径ID
+          type: string
+          required: true
+        - name: "project-content"
+          in: "body"
+          description: "项目内容"
+          required: true
+          schema:
+            $ref: "#/definitions/Directory"
+      responses:
+        '201':
+           description: updata success
+        '400':
+           description: updata failed
+
+  /projects/{id}/dataobj:
+    put:
+      tags:
+      - "publish"
+      summary: "发布业务对象"
+      description: 发布业务对象
+      parameters:
+        - in: path
+          name: id
+          description: 项目ID
+          required: true
+          type: string
+      responses:
+        '200':
+          description: 发布业务对象成功
+        '404':
+          description: 项目不存在
+
+definitions:
+  Project:
+    type: object
+    properties:
+      id:
+        type: integer
+        format: int64
+        example: 123
+      name:
+        type: string
+        example: "safsd"
+    required:
+      - id
+      - name
+  Node:
+    type: object
+    properties:
+      id:
+        type: string
+      nodes:
+        type: array
+        items:
+          $ref: '#/definitions/nodeobj'
+    required:
+      - id
+      - nodes
+
+  nodeobj:
+    type: object
+    properties:
+      id:
+        type: string
+        example: 'm1'
+      name:
+        type: string
+        example: '模型1'
+      path:
+        type: string
+        example: 'd1/d2'
+      type:
+        type: string
+        example: 'model'
+    required:
+      - id
+      - name
+      - path
+      - type
+
+  BOI:
+    type: object
+    properties:
+      raw:
+        type: object
+        example: {}
+      mdl:
+        type: object
+        example: {}
+      prop:
+        type: object
+        example: {}
+      con:
+        type: object
+        example: {}
+    required:
+      - raw
+      - mdl
+      - prop
+      - con
+
+  Directory:
+    type: object
+    properties:
+      name:
+        type: string
+        example: '业务对象2'
+      path:
+        type: string
+        example: 'd3/d4'
+    required:
+      - name
+      - path
+
+externalDocs:
+  description: "Find out more about Swagger"
+  url: "http://swagger.io"
