@@ -39,12 +39,18 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/Project'
+              $ref: '#/definitions/Meta'
             example:
               - id: 101
                 name: 广东风电
+                path: "proj1234"
+                type: "project"
+                created: "2017-10-12"
               - id: 102
                 name: 国网财务分析
+                path: "proj234"
+                type: "project"
+                created: "2017-10-12"
         405:
           description: "Invalid input"
 
@@ -64,7 +70,7 @@ paths:
         description: "待创建项目内容"
         required: true
         schema:
-          $ref: "#/definitions/Project"
+          $ref: "#/definitions/Meta"
       responses:
         '201':
           description: 创建项目成功
@@ -93,11 +99,14 @@ paths:
             type: array
             items:
               $ref: '#/definitions/Node'
+        '404':
+          description: 项目不存在
+
 
     put:
       tags:
       - "project"
-      summary: "更新项目内容"
+      summary: "修改项目名称"
       description: 更新项目内容
       operationId: ""
       produces:
@@ -110,10 +119,11 @@ paths:
           required: true
         - name: "project"
           in: "body"
-          description: "项目内容"
+          description: "项目名称"
           required: true
           schema:
-            $ref: "#/definitions/BOI"
+            type: string
+            example: "风电项目"
       responses:
         '200':
           description: success
@@ -231,6 +241,7 @@ paths:
           description: 发布业务对象成功
         '404':
           description: 项目不存在
+
   /projects/{id}/model:
     post:
       tags:
@@ -254,10 +265,13 @@ paths:
           schema:
             type: array
             items:
-              $ref: "#/definitions/Model"
+              $ref: "#/definitions/Meta"
             example:
-                name: 模型名称
-                path: d3/d4
+              id: ""
+              name: "模型名称"
+              path: "d3/d4"
+              nodetype: "model"
+              created: "2017-10-12"
         400:
           description: "创建模型失败"
 
@@ -315,16 +329,21 @@ paths:
           schema:
             type: array
             items:
-              $ref: '#/definitions/ModelWithMeta'
+              $ref: '#/definitions/Node'
             example:
+              meta:
+                id: 'model123'
                 name: '模型名称'
                 path: 'd3/d4'
-                raw: {}
-                mdl: {}
-                prop: {}
-                con: {}
+                nodetype: 'model'
+                created: '2017-10-12'
+              raw: {}
+              mdl: {}
+              prop: {}
+              con: {}
         400:
           description: "更新失败"
+
   /projects/{pid}/model/{mid}/bos:
     get:
       tags:
@@ -448,39 +467,6 @@ definitions:
     required:
       - id
       - name
-  Node:
-    type: object
-    properties:
-      id:
-        type: string
-      nodes:
-        type: array
-        items:
-          $ref: '#/definitions/BOI'
-    required:
-      - id
-      - nodes
-
-  BOI:
-    type: object
-    properties:
-      raw:
-        type: object
-        example: {}
-      mdl:
-        type: object
-        example: {}
-      prop:
-        type: object
-        example: {}
-      con:
-        type: object
-        example: {}
-    required:
-      - raw
-      - mdl
-      - prop
-      - con
 
   Directory:
     type: object
@@ -494,6 +480,7 @@ definitions:
     required:
       - name
       - path
+
   ModelFiles:
       type: object
       properties:
@@ -515,6 +502,20 @@ definitions:
         - id
         - files
 
+  Meta:
+    type: object
+    properties:
+      id:
+        type: string
+      name:
+        type: string
+      path:
+        type: string
+      nodetype:
+        type: string
+      created:
+        type: string
+
   Model:
     type: object
     properties:
@@ -526,28 +527,38 @@ definitions:
       - name
       - path
 
-  ModelWithMeta:
+  Node:
+    type: object
+    properties:
+      meta:
         type: object
         properties:
+          id:
+            type: string
           name:
             type: string
           path:
             type: string
-          raw:
-            type: object
-          mdl:
-            type: object
-          prop:
-            type: object
-          con:
-            type: object
+          nodetype:
+            type: string
+          created:
+            type: string
         required:
-        - name
-        - path
-        - raw
-        - mdl
-        - prop
-        - con
+          - id
+          - name
+          - path
+          - nodetype
+          - created
+      raw:
+        type: object
+      mdl:
+        type: object
+      prop:
+        type: object
+      con:
+        type: object
+    required:
+      - meta
 
   BOs:
       type: object
