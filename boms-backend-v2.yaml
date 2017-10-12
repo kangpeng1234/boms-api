@@ -231,6 +231,208 @@ paths:
           description: 发布业务对象成功
         '404':
           description: 项目不存在
+  /projects/{id}/model:
+    post:
+      tags:
+      - "model"
+      summary: "新建模型文件"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "id"
+        in: "path"
+        description: "ID of project"
+        required: true
+        type: "string"
+      responses:
+        201:
+          description: "创建模型成功"
+          schema:
+            type: array
+            items:
+              $ref: "#/definitions/Model"
+            example:
+                name: 模型名称
+                path: d3/d4
+        400:
+          description: "创建模型失败"
+
+  /projects/{pid}/model/{mid}:
+    delete:
+      tags:
+      - "model"
+      summary: "删除模型文件"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pid"
+        in: "path"
+        description: "项目ID"
+        required: true
+        type: "string"
+      - name: "mid"
+        in: "path"
+        description: "模型ID"
+        required: true
+        type: "string"
+      responses:
+          '204':
+             description: 删除模型成功
+          '404':
+             description: 删除模型失败
+    put:
+      tags:
+      - "model"
+      summary: "更新模型内容"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pid"
+        in: "path"
+        description: "项目ID"
+        required: true
+        type: "string"
+      - name: "mid"
+        in: "path"
+        description: "模型ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "更新成功"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ModelWithMeta'
+            example:
+                name: '模型名称'
+                path: 'd3/d4'
+                raw: {}
+                mdl: {}
+                prop: {}
+                con: {}
+        400:
+          description: "更新失败"
+  /projects/{pid}/model/{mid}/bos:
+    get:
+      tags:
+      - "model"
+      summary: "返回模型包含的业务对象"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pid"
+        in: "path"
+        description: "项目ID"
+        required: true
+        type: "string"
+      - name: "mid"
+        in: "path"
+        description: "模型ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/BOs'
+            example:
+                id: 'model1123'
+                mdl: []
+        400:
+          description: "failed"
+  /projects/{pid}/model/{mid}/connections:
+    get:
+      tags:
+      - "model"
+      summary: "返回模型包含的关联关系"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pid"
+        in: "path"
+        description: "项目ID"
+        required: true
+        type: "string"
+      - name: "mid"
+        in: "path"
+        description: "模型ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/BOCon'
+            example:
+                id: 'model1123'
+                mdl: []
+        400:
+          description: "failed"
+  /projects/{pid}/model/{mid}/files:
+    get:
+      tags:
+      - "model"
+      summary: "返回模型文件内容"
+      description: ""
+      operationId: ""
+      consumes:
+      - "application/json"
+      produces:
+      - "application/json"
+      parameters:
+      - name: "pid"
+        in: "path"
+        description: "项目ID"
+        required: true
+        type: "string"
+      - name: "mid"
+        in: "path"
+        description: "模型ID"
+        required: true
+        type: "string"
+      responses:
+        200:
+          description: "success"
+          schema:
+            type: array
+            items:
+              $ref: '#/definitions/ModelFiles'
+            example:
+                id: 'model1123'
+                files:
+                  - name: m1_id_model.json
+                    content: ''
+                  - name: m1_id_con.json
+                    content: ''
+                  - name: m1_id_prop.json
+                    content: ''
+        400:
+          description: "failed"
 
 definitions:
   Project:
@@ -254,31 +456,10 @@ definitions:
       nodes:
         type: array
         items:
-          $ref: '#/definitions/nodeobj'
+          $ref: '#/definitions/BOI'
     required:
       - id
       - nodes
-
-  nodeobj:
-    type: object
-    properties:
-      id:
-        type: string
-        example: 'm1'
-      name:
-        type: string
-        example: '模型1'
-      path:
-        type: string
-        example: 'd1/d2'
-      type:
-        type: string
-        example: 'model'
-    required:
-      - id
-      - name
-      - path
-      - type
 
   BOI:
     type: object
@@ -313,6 +494,76 @@ definitions:
     required:
       - name
       - path
+  ModelFiles:
+      type: object
+      properties:
+        id:
+          type: string
+        files:
+          type: array
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+              content:
+                type: string
+            required:
+              - name
+              - content
+      required:
+        - id
+        - files
+
+  Model:
+    type: object
+    properties:
+      name:
+        type: string
+      path:
+        type: string
+    required:
+      - name
+      - path
+
+  ModelWithMeta:
+        type: object
+        properties:
+          name:
+            type: string
+          path:
+            type: string
+          raw:
+            type: object
+          mdl:
+            type: object
+          prop:
+            type: object
+          con:
+            type: object
+        required:
+        - name
+        - path
+        - raw
+        - mdl
+        - prop
+        - con
+
+  BOs:
+      type: object
+      properties:
+        id:
+          type: string
+        mdl:
+          type: object
+
+  BOCon:
+      type: object
+      properties:
+        id:
+          type: string
+        con:
+          type: object
 
 externalDocs:
   description: "Find out more about Swagger"
